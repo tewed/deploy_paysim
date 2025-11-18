@@ -205,3 +205,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Datasets
+/PS_20174392719_1491204439457_log.csv
+/paysim_train.csv
+/paysim_test.csv
