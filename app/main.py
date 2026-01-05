@@ -4,33 +4,29 @@ import pandas as pd
 import pickle
 import numpy as np
 import os
+import xgboost
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 # define input data schema
 class TransactionData(BaseModel):
-    step: int
+
     type:  object
     amount: float
-    nameOrig: object
     oldbalanceOrig: float
     newbalanceOrig: float
-    nameDest: object
     oldbalanceDest: float
     newbalanceDest: float
-
 
     class Config:
         schema_extra = {
             "example": 
             {
+                "type": "CASH_OUT",
                 "amount": 230.0,
                 "oldbalanceOrg": 26000.05,
                 "newbalanceOrig": 123456.00,
                 "oldbalanceDest": 123.56,
-                "newbalanceDest": 250.06,
-                'type_CASH_OUT':1.0,
-                'type_DEBIT':0.0,
-                'type_PAYMENT':0.0,
-                'type_TRANSFER':0.0
+                "newbalanceDest": 250.06
             }
         }
 
@@ -43,29 +39,26 @@ app = FastAPI(
     description="Predicts fraudulent transactions from PaySim data",
     version="1.0.0"
 )
- 
-# create our prediction endpoint:
-@app.post("/predict")
+
 def load_artifacts():
     '''Load model and artifacts'''
     model = pickle.load(open("./pickles/fraud_model.pkl", "rb"))
     scaler = pickle.load(open("./pickles/scaler.pkl", "rb"))
     ohe = pickle.load(open("./pickles/onehot_encoder.pkl", "rb"))
     return model, scaler, ohe
-
-
+ 
+# create our prediction endpoint:
+@app.post("/predict")
 def predict_fraud(transaction: TransactionData):
     # Load model and preprocessing objects
     model, scaler, ohe = load_artifacts()
     input_df = pd.DataFrame([{ 
                 'amount':transaction.amount,
                 'oldbalanceOrg':transaction.oldbalanceOrg,
+                'newbalanceOrig': transaction.newbalanceOrig,
                 'oldbalanceDest':transaction.oldbalanceDest,
                 'newbalanceDest':transaction.newbalanceDest,
-                'type_CASH_OUT':transaction.type_CASH_OUT,
-                'type_DEBIT':transaction.type_DEBIT,
-                'type_PAYMENT':transaction.type_PAYMENT,
-                'type_TRANSFER':transaction.type_TRANSFER
+                'type':transaction.type,
                     }
                 ])
     # Convert fields to model input
