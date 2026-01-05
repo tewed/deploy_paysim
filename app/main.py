@@ -22,15 +22,15 @@ class TransactionData(BaseModel):
         schema_extra = {
             "example": 
             {
-                "step": 3,
-                "type":"CASH_OUT",
                 "amount": 230.0,
-                "nameOrig":"C123456",
-                "oldbalanceOrig": 26000.05,
+                "oldbalanceOrg": 26000.05,
                 "newbalanceOrig": 123456.00,
-                "nameDest": "M123456",
                 "oldbalanceDest": 123.56,
-                "newbalanceDest": 250.06
+                "newbalanceDest": 250.06,
+                'type_CASH_OUT':1.0,
+                'type_DEBIT':0.0,
+                'type_PAYMENT':0.0,
+                'type_TRANSFER':0.0
             }
         }
 
